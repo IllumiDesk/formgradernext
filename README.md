@@ -25,7 +25,7 @@ source venv/bin/activate
 Install and activate all extensions (assignment list, create assignment, formgrader, and validate):
 
 ```bash
-jupyter nbextension install --sys-prefix --py async_nbgrader --overwrite
+jupyter nbextension install --symlink --sys-prefix --py async_nbgrader --overwrite
 jupyter nbextension enable --sys-prefix --py async_nbgrader
 jupyter serverextension enable --sys-prefix --py async_nbgrader
 ```

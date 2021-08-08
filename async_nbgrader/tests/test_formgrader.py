@@ -6,7 +6,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
 from nbgrader.tests.nbextensions import formgrade_utils as utils
-from nbgrader.tests.nbextensions.test_formgrader import browser, gradebook, nbserver, fake_home_dir, monkeypatch_module
+from nbgrader.tests.nbextensions.test_formgrader import browser
+from nbgrader.tests.nbextensions.test_formgrader import gradebook
+from nbgrader.tests.nbextensions.test_formgrader import nbserver
+from nbgrader.tests.nbextensions.test_formgrader import fake_home_dir
+from nbgrader.tests.nbextensions.test_formgrader import monkeypatch_module
 
 
 if sys.platform == 'win32':

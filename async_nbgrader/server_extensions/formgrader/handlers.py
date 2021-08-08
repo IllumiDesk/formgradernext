@@ -18,7 +18,13 @@ class AsyncAutogradeHandler(AutogradeHandler):
     @web.authenticated
     @check_xsrf
     @check_notebook_dir
-    def post(self, assignment_id, student_id):
+    def post(self, assignment_id:str, student_id:str):
+        """Handles a post request to initiate an auto grading job.
+
+        Args:
+            assignment_id (str): the assignment id which is equivalent to the assignment name.
+            student_id (str): the student id which is equivalent to the student name.
+        """
         scheduler.add_job(
             autograde_assignment, "date", args=[None, assignment_id, student_id]
         )
@@ -27,7 +33,7 @@ class AsyncAutogradeHandler(AutogradeHandler):
                 {
                     "success": True,
                     "queued": True,
-                    "message": "Submission Autograding queued",
+                    "message": "Submission for Autograding queued",
                 }
             )
         )
@@ -51,7 +57,7 @@ static_handlers = [
     (r"/formgrader/static/js/utils.js$", FormgraderStaticHandler),
 ]
 
-def rewrite(nbapp, x):
+def rewrite(nbapp: NotebookApp, x):
     web_app = nbapp.web_app
     pat = ujoin(web_app.settings["base_url"], x[0].lstrip("/"))
     return (pat,) + x[1:]
@@ -59,9 +65,9 @@ def rewrite(nbapp, x):
 def load_jupyter_server_extension(nbapp: NotebookApp):
     """Start background processor"""
     if os.environ.get("NBGRADER_ASYNC_MODE", "true") == "true":
-        nbapp.log.info("Starting background processor for nbgrader serverextension")
+        nbapp.log.info("Starting background processor for asycn-nbgrader serverextension")
         nbapp.web_app.add_handlers(".*$", [rewrite(nbapp, x) for x in handlers])
         scheduler.start()
     else:
-        nbapp.log.info("Skipping background processor for nbgrader serverextension")
+        nbapp.log.info("Skipping background processor and using standard nbgrader serverextension")
     nbapp.web_app.add_handlers(".*$", [rewrite(nbapp, x) for x in static_handlers])
