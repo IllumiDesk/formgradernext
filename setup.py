@@ -12,10 +12,7 @@ setup_args = dict(
     version=version_ns['__version__'],
     packages=find_packages(),
     install_requires=[
-        "jupyter_core==4.7.1",
-        "notebook==6.4.2",
-        "nbgrader==0.6.2",
-        "apscheduler==3.7.0",
+        "jupyter_server==1.10.2",
     ],
     include_package_data=True
 )

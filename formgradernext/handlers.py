@@ -1,73 +1,55 @@
-import json
 import os
-import pkgutil
+import re
+import sys
 
 from tornado import web
 
-from nbgrader.server_extensions.formgrader.apihandlers import AutogradeHandler
-from nbgrader.server_extensions.formgrader.base import check_xsrf, check_notebook_dir
-from notebook.base.handlers import IPythonHandler
-from notebook.notebookapp import NotebookApp
-from notebook.utils import url_path_join as ujoin
-
-from .scheduler import scheduler
-from .tasks import autograde_assignment
+from nbgrader.base import BaseHandler
+from nbgrader.base import check_xsrf
+from nbgrader.base import check_notebook_dir
 
 
-class AsyncAutogradeHandler(AutogradeHandler):
-    @web.authenticated
-    @check_xsrf
-    @check_notebook_dir
-    def post(self, assignment_id:str, student_id:str):
-        """Handles a post request to initiate an auto grading job.
-
-        Args:
-            assignment_id (str): the assignment id which is equivalent to the assignment name.
-            student_id (str): the student id which is equivalent to the student name.
-        """
-        scheduler.add_job(
-            autograde_assignment, "date", args=[None, assignment_id, student_id]
-        )
-        self.write(
-            json.dumps(
-                {
-                    "success": True,
-                    "queued": True,
-                    "message": "Submission for Autograding queued",
-                }
-            )
-        )
-
-
-class FormgraderStaticHandler(IPythonHandler):
+class LmsTemplate(BaseHandler):
+    """Render LMS app"""
     def get(self):
-        # this is a hack to override text in formgrader, we are appending our JS module to a module imported in formgrader
-        original_data = pkgutil.get_data("nbgrader", "server_extensions/formgrader/static/js/utils.js").decode("utf-8")
-        common_js = pkgutil.get_data(__name__, "static/common.js").decode("utf-8")
-        self.write(original_data)
-        self.write(common_js)
-        self.set_header('Content-Type', 'application/javascript')
-        self.finish()
+        raise web.HTTPError(404)
 
-handlers = [
-    (r"/formgrader/api/submission/([^/]+)/([^/]+)/autograde", AsyncAutogradeHandler),
+
+root_path = os.path.dirname(__file__)
+template_path = os.path.join(root_path, 'templates')
+static_path = os.path.join(root_path, 'static')
+
+default_handlers = [
+    (r"/formgradernext/?", web.StaticFileHandler, {'path': fonts_path}),
 ]
 
-static_handlers = [
-    (r"/formgrader/static/js/utils.js$", FormgraderStaticHandler),
-]
 
-def rewrite(nbapp: NotebookApp, x):
-    web_app = nbapp.web_app
-    pat = ujoin(web_app.settings["base_url"], x[0].lstrip("/"))
-    return (pat,) + x[1:]
 
-def load_jupyter_server_extension(nbapp: NotebookApp):
-    """Start background processor"""
-    if os.environ.get("NBGRADER_ASYNC_MODE", "true") == "true":
-        nbapp.log.info("Starting background processor for asycn-nbgrader serverextension")
-        nbapp.web_app.add_handlers(".*$", [rewrite(nbapp, x) for x in handlers])
-        scheduler.start()
-    else:
-        nbapp.log.info("Skipping background processor and using standard nbgrader serverextension")
-    nbapp.web_app.add_handlers(".*$", [rewrite(nbapp, x) for x in static_handlers])
+from jupyter_server.base.handlers import JupyterHandler
+from jupyter_server.extension.handler import ExtensionHandlerMixin, ExtensionHandlerJinjaMixin
+from jupyter_server.utils import url_escape
+
+class ParameterHandler(ExtensionHandlerMixin, JupyterHandler):
+    def get(self, matched_part=None, *args, **kwargs):
+        var1 = self.get_argument('var1', default=None)
+        components = [x for x in self.request.path.split("/") if x]
+        self.write('<h1>Hello LMS from handler.</h1>')
+        self.write('<p>matched_part: {}</p>'.format(url_escape(matched_part)))
+        self.write('<p>var1: {}</p>'.format(url_escape(var1)))
+        self.write('<p>components: {}</p>'.format(components))
+
+class BaseTemplateHandler(ExtensionHandlerJinjaMixin, ExtensionHandlerMixin, JupyterHandler): pass
+
+class IndexHandler(BaseTemplateHandler):
+    def get(self):
+        self.log.debug(self.get_template('index.html'))
+        self.write(self.render_template("index.html"))
+
+class TemplateHandler(BaseTemplateHandler):
+    def get(self, path):
+        self.log.debug(self.get_template('lms.html'))
+        self.write(self.render_template('lms.html', path=path))
+
+class ErrorHandler(BaseTemplateHandler):
+    def get(self, path):
+        self.write(self.render_template('error.html'))
