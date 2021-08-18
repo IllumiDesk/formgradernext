@@ -1,73 +1,64 @@
-import json
 import os
-import pkgutil
+import requests
+import sys
 
+from jinja2 import Environment, BaseLoader
 from tornado import web
 
-from nbgrader.server_extensions.formgrader.apihandlers import AutogradeHandler
-from nbgrader.server_extensions.formgrader.base import check_xsrf, check_notebook_dir
-from notebook.base.handlers import IPythonHandler
+from nbgrader.server_extensions.formgrader.base import (
+    BaseHandler,
+    check_xsrf,
+    check_notebook_dir,
+)
+
 from notebook.notebookapp import NotebookApp
 from notebook.utils import url_path_join as ujoin
 
-from .scheduler import scheduler
-from .tasks import autograde_assignment
+root_path = os.path.dirname(__file__)
+template_path = os.path.join(root_path, "templates")
+
+os.makedirs(template_path, exist_ok=True)
+
+lms_version = os.environ.get("LMS_VERSION") or "0.1.0"
+
+template_response = requests.get(
+    f"https://content.illumidesk.com/lms/{lms_version}/index.html"
+)
+template_html = template_response.text.replace(
+    "</head>", '<script>var base_url = "{{ base_url }}";</script></head>'
+)
 
 
-class AsyncAutogradeHandler(AutogradeHandler):
+class LMSHandler(BaseHandler):
     @web.authenticated
     @check_xsrf
     @check_notebook_dir
-    def post(self, assignment_id:str, student_id:str):
-        """Handles a post request to initiate an auto grading job.
-
-        Args:
-            assignment_id (str): the assignment id which is equivalent to the assignment name.
-            student_id (str): the student id which is equivalent to the student name.
-        """
-        scheduler.add_job(
-            autograde_assignment, "date", args=[None, assignment_id, student_id]
-        )
-        self.write(
-            json.dumps(
-                {
-                    "success": True,
-                    "queued": True,
-                    "message": "Submission for Autograding queued",
-                }
+    def get(self):
+        html = (
+            Environment(loader=BaseLoader)
+            .from_string(template_html)
+            .render(
+                url_prefix=self.url_prefix,
+                base_url=self.base_url,
+                windows=(sys.prefix == "win32"),
+                course_id=self.api.course_id,
+                exchange=self.api.exchange,
+                exchange_missing=self.api.exchange_missing,
             )
         )
+        self.write(html)
 
-
-class FormgraderStaticHandler(IPythonHandler):
-    def get(self):
-        # this is a hack to override text in formgrader, we are appending our JS module to a module imported in formgrader
-        original_data = pkgutil.get_data("nbgrader", "server_extensions/formgrader/static/js/utils.js").decode("utf-8")
-        common_js = pkgutil.get_data(__name__, "static/common.js").decode("utf-8")
-        self.write(original_data)
-        self.write(common_js)
-        self.set_header('Content-Type', 'application/javascript')
-        self.finish()
 
 handlers = [
-    (r"/formgrader/api/submission/([^/]+)/([^/]+)/autograde", AsyncAutogradeHandler),
+    (r"/formgradernext$", LMSHandler),
 ]
 
-static_handlers = [
-    (r"/formgrader/static/js/utils.js$", FormgraderStaticHandler),
-]
 
 def rewrite(nbapp: NotebookApp, x):
     web_app = nbapp.web_app
     pat = ujoin(web_app.settings["base_url"], x[0].lstrip("/"))
     return (pat,) + x[1:]
 
+
 def load_jupyter_server_extension(nbapp: NotebookApp):
-    """Start background processor"""
-    if os.environ.get("NBGRADER_ASYNC_MODE", "true") == "true":
-        nbapp.log.info("Starting background processor for asycn-nbgrader serverextension")
-        nbapp.web_app.add_handlers(".*$", [rewrite(nbapp, x) for x in handlers])
-        scheduler.start()
-    else:
-        nbapp.log.info("Skipping background processor and using standard nbgrader serverextension")
-    nbapp.web_app.add_handlers(".*$", [rewrite(nbapp, x) for x in static_handlers])
+    nbapp.web_app.add_handlers(".*$", [rewrite(nbapp, x) for x in handlers])
