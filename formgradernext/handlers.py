@@ -45,7 +45,7 @@ class LMSHandler(BaseHandler):
 
 
 handlers = [
-    (r"/formgradernext$", LMSHandler),
+    (r"/formgradernext/?", LMSHandler),
 ]
 
 
