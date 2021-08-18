@@ -14,11 +14,6 @@ from nbgrader.server_extensions.formgrader.base import (
 from notebook.notebookapp import NotebookApp
 from notebook.utils import url_path_join as ujoin
 
-root_path = os.path.dirname(__file__)
-template_path = os.path.join(root_path, "templates")
-
-os.makedirs(template_path, exist_ok=True)
-
 lms_version = os.environ.get("LMS_VERSION") or "0.1.0"
 
 template_response = requests.get(
