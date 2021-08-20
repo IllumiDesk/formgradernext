@@ -21,7 +21,7 @@ $(function() {
     $('.col-md-2 .page-header h1').text('Grader Console');
     $('.jupyter-logo').html(logoSvg);
     $('#header-container #ipython_notebook a').html('IllumiDesk').attr('style', commonStyle);
-    var formGraderPath = window.location.origin + '/formgrader';
+    var formGraderPath = window.location.origin + '/formgradernext';
     if (window.location.pathname === '/tree' && $('a[href="' + formGraderPath + '"]').length === 0) {
         $("#tabs").append(
             $('<li>')

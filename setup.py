@@ -1,7 +1,7 @@
 import os
 from setuptools import setup, find_packages
 
-name = 'async_nbgrader'
+name = 'formgradernext'
 here = os.path.abspath(os.path.dirname(__file__))
 version_ns = {}
 with open(os.path.join(here, name, '_version.py')) as f:
@@ -15,7 +15,6 @@ setup_args = dict(
         "jupyter_core==4.7.1",
         "notebook==6.4.2",
         "nbgrader==0.6.2",
-        "apscheduler==3.7.0",
     ],
     include_package_data=True
 )
