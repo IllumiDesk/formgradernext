@@ -14,6 +14,8 @@ from nbgrader.server_extensions.formgrader.base import (
 from notebook.notebookapp import NotebookApp
 from notebook.utils import url_path_join as ujoin
 
+from .middleware import coop_coep_headers
+
 lms_version = os.environ.get("LMS_VERSION") or "0.1.0"
 
 template_response = requests.get(
@@ -23,11 +25,17 @@ template_html = template_response.text.replace(
     "</head>", '<script>var base_url = "{{ base_url }}";</script></head>'
 )
 
+# Hack(@gzuidhof): We need this until the index file in the bundle itself contains crossorigin (or crossorigin="anonymous") tags
+# we need to specify crossorigin assets specifically due to the COOP and COEP headers.
+template_html = template_html.replace("<script ", "<script crossorigin ")
+template_html = template_html.replace("<link ", "<link crossorigin ")
+
 
 class LMSHandler(BaseHandler):
     @web.authenticated
     @check_xsrf
     @check_notebook_dir
+    @coop_coep_headers
     def get(self):
         html = (
             Environment(loader=BaseLoader)
@@ -46,6 +54,7 @@ class LMSHandler(BaseHandler):
 
 handlers = [
     (r"/formgradernext/?", LMSHandler),
+    (r"/formgradernext/.*", LMSHandler),
 ]
 
 
