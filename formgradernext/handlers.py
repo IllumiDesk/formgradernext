@@ -46,10 +46,7 @@ class LMSHandler(BaseHandler):
 
 
 handlers = [
-    (r"/formgradernext/?", LMSHandler),
-    (r"/formgradernext/manage-assignments/?", LMSHandler),
-    (r"/formgradernext/manage-students/?", LMSHandler),
-    (r"/formgradernext/manual-grading/?", LMSHandler),
+    (r"/formgradernext.*", LMSHandler),
 ]
 
 
