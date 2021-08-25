@@ -22,7 +22,7 @@ $(function() {
     $('.jupyter-logo').html(logoSvg);
     $('#header-container #ipython_notebook a').html('IllumiDesk').attr('style', commonStyle);
     var formGraderPath = window.location.origin + '/formgradernext';
-    if (window.location.pathname === '/tree' && $('a[href="' + formGraderPath + '"]').length === 0) {
+    if (window.location.pathname.startsWith('/tree') && $('a[href="' + formGraderPath + '"]').length === 0) {
         $("#tabs").append(
             $('<li>')
             .append(

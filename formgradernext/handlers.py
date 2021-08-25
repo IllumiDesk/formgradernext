@@ -24,7 +24,15 @@ def get_template(version):
         f"https://content.illumidesk.com/lms/{version}/index.html"
     )
     template_html = template_response.text.replace(
-        "</head>", '<script>var base_url = "{{ base_url }}";</script></head>'
+        "</head>",
+        '''
+            <script>
+                var base_url = "{{ base_url }}";
+                var url_prefix = "{{ url_prefix }}";
+                var base_url_suffix = "{{ base_url_suffix }}";
+            </script>
+        </head>
+        '''
     )
     # Hack(@gzuidhof): We need this until the index file in the bundle itself contains crossorigin (or crossorigin="anonymous") tags
     # we need to specify crossorigin assets specifically due to the COOP and COEP headers.
@@ -42,6 +50,7 @@ class LMSHandler(BaseHandler):
             .render(
                 url_prefix=self.url_prefix,
                 base_url=self.base_url,
+                base_url_suffix="/formgradernext",
                 windows=(sys.prefix == "win32"),
                 course_id=self.api.course_id,
                 exchange=self.api.exchange,
