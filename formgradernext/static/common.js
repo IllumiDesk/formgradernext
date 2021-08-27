@@ -21,8 +21,8 @@ $(function() {
     $('.col-md-2 .page-header h1').text('Grader Console');
     $('.jupyter-logo').html(logoSvg);
     $('#header-container #ipython_notebook a').html('IllumiDesk').attr('style', commonStyle);
-    var formGraderPath = window.location.origin + '/formgradernext';
-    if (window.location.pathname.startsWith('/tree') && $('a[href="' + formGraderPath + '"]').length === 0) {
+    var formGraderPath = window.location.pathname.replace(/\/tree\/?$/, '') + '/formgradernext';
+    if (/\/tree\/?$/.test(window.location.pathname) && $('a[href="' + formGraderPath + '"]').length === 0) {
         $("#tabs").append(
             $('<li>')
             .append(
