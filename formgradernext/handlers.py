@@ -16,20 +16,27 @@ from notebook.utils import url_path_join as ujoin
 
 from .middleware import coop_coep_headers
 
-lms_version = os.environ.get("LMS_VERSION") or "0.1.0"
+DEFAULT_LMS_VERSION = os.environ.get("DEFAULT_LMS_VERSION") or "0.1.0"
 
-template_response = requests.get(
-    f"https://content.illumidesk.com/lms/{lms_version}/index.html"
-)
-template_html = template_response.text.replace(
-    "</head>", '<script>var base_url = "{{ base_url }}";</script></head>'
-)
 
-# Hack(@gzuidhof): We need this until the index file in the bundle itself contains crossorigin (or crossorigin="anonymous") tags
-# we need to specify crossorigin assets specifically due to the COOP and COEP headers.
-template_html = template_html.replace("<script ", "<script crossorigin ")
-template_html = template_html.replace("<link ", "<link crossorigin ")
-
+def get_template(version):
+    template_response = requests.get(
+        f"https://content.illumidesk.com/lms/{version}/index.html"
+    )
+    template_html = template_response.text.replace(
+        "</head>",
+        '''
+            <script>
+                var base_url = "{{ base_url }}";
+                var url_prefix = "{{ url_prefix }}";
+                var base_url_suffix = "{{ base_url_suffix }}";
+            </script>
+        </head>
+        '''
+    )
+    # Hack(@gzuidhof): We need this until the index file in the bundle itself contains crossorigin (or crossorigin="anonymous") tags
+    # we need to specify crossorigin assets specifically due to the COOP and COEP headers.
+    return template_html.replace("<script ", "<script crossorigin ").replace("<link ", "<link crossorigin ")
 
 class LMSHandler(BaseHandler):
     @web.authenticated
@@ -39,10 +46,11 @@ class LMSHandler(BaseHandler):
     def get(self):
         html = (
             Environment(loader=BaseLoader)
-            .from_string(template_html)
+            .from_string(get_template(self.get_query_argument("lms_version", DEFAULT_LMS_VERSION)))
             .render(
                 url_prefix=self.url_prefix,
                 base_url=self.base_url,
+                base_url_suffix="/formgradernext",
                 windows=(sys.prefix == "win32"),
                 course_id=self.api.course_id,
                 exchange=self.api.exchange,
@@ -53,8 +61,7 @@ class LMSHandler(BaseHandler):
 
 
 handlers = [
-    (r"/formgradernext/?", LMSHandler),
-    (r"/formgradernext/.*", LMSHandler),
+    (r"/formgradernext.*", LMSHandler),
 ]
 
 
