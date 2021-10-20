@@ -17,8 +17,15 @@ cd formgradernext
 virtualenv -p python3 venv
 source venv/bin/activate
 ```
+3. Install NBGrader
+```bash
+pip install nbgrader
+jupyter nbextension install --sys-prefix --py nbgrader --overwrite
+jupyter nbextension enable --sys-prefix --py nbgrader
+jupyter serverextension enable --sys-prefix --py nbgrader
+```
 
-3. Install and Activate Extensions
+4. Install and Activate formgradernext Extensions
 
 Install and activate all extensions (assignment list, create assignment, formgrader, and validate):
 
