@@ -16,7 +16,7 @@ from notebook.utils import url_path_join as ujoin
 
 from .middleware import coop_coep_headers
 
-DEFAULT_LMS_VERSION = os.environ.get("DEFAULT_LMS_VERSION") or "0.1.0"
+DEFAULT_LMS_VERSION = os.environ.get("DEFAULT_LMS_VERSION") or "0.2.0"
 
 
 def get_template(version):
