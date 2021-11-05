@@ -58,7 +58,7 @@ target/
 .selenium.screenshot.png
 
 conda-bld
-gh_api.sqlite
+*.sqlite
 MANIFEST
 README
 .pytest_cache
