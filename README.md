@@ -38,7 +38,7 @@ source venv/bin/activate
 3. Install `async-nbgrader`:
 
 ```bash
-pip install pip install git+ssh://git@github.com/IllumiDesk/async_nbgrader.git
+pip install git+ssh://git@github.com/IllumiDesk/async_nbgrader.git
 jupyter nbextension install --sys-prefix --py async_nbgrader --overwrite
 jupyter nbextension enable --sys-prefix --py async_nbgrader
 jupyter serverextension enable --sys-prefix --py async_nbgrader
