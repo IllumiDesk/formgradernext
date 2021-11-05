@@ -2,18 +2,6 @@
 
 A jupyter extension which serves a custom LMS UI as a replacement for [nbgrader](https://github.com/jupyter/nbgrader)'s `Formgrader`.
 
-## Installation
-
-1. Install this setup directly from GitHub using `pip install`:
-
-```bash
-pip install git+ssh://git@github.com/IllumiDesk/formgradernext.git
-cd formgradernext
-```
-# Formgrader Next
-
-A jupyter extension which serves a custom LMS UI as a replacement for [nbgrader](https://github.com/jupyter/nbgrader)'s `Formgrader`.
-
 ## Requirements
 
 - Python 3.8+
@@ -21,21 +9,27 @@ A jupyter extension which serves a custom LMS UI as a replacement for [nbgrader]
 
 ## Installation
 
-1. Install this setup directly from GitHub using `pip install`:
+1. Clone this repo:
 
 ```bash
-pip install -e .
+git clone https://github.com/illumidesk/formgradernext
 cd formgradernext
 ```
 
-2. Create and activate your virtual environment:
+1. Create and activate your virtual environment:
 
 ```bash
 virtualenv -p python3 venv
 source venv/bin/activate
 ```
 
-3. Install `async-nbgrader`:
+1. Install this setup directly from GitHub using `pip install`:
+
+```bash
+pip install -e .
+```
+
+1. Install `async-nbgrader`:
 
 ```bash
 pip install git+ssh://git@github.com/IllumiDesk/async_nbgrader.git

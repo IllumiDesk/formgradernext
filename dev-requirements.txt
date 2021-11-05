@@ -1,8 +1,8 @@
 pip-tools
-pytest==6.2.4
+pytest
 pytest-cov
 pytest-rerunfailures
-pytest-xdist==2.2.1
+pytest-xdist
 coverage
 selenium
 sphinx
