@@ -1,7 +1,5 @@
 """Tornado handlers for formgrader custom UI."""
-import os
-
-from .handlers import load_jupyter_server_extension
+from .handlers import load_jupyter_server_extension  # noqa: F401
 
 
 def _jupyter_nbextension_paths():
@@ -10,9 +8,10 @@ def _jupyter_nbextension_paths():
             section="common",
             src="static",
             dest="formgradernext",
-            require="formgradernext/common"
+            require="formgradernext/common",
         ),
     ]
+
 
 def _jupyter_server_extension_paths():
     return [

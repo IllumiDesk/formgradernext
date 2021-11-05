@@ -29,7 +29,7 @@ source venv/bin/activate
 pip install -e .
 ```
 
-1. Install `async-nbgrader`:
+1. Install `async-nbgrader` and activate both client and server extensions:
 
 ```bash
 pip install git+ssh://git@github.com/IllumiDesk/async_nbgrader.git
@@ -38,9 +38,7 @@ jupyter nbextension enable --sys-prefix --py async_nbgrader
 jupyter serverextension enable --sys-prefix --py async_nbgrader
 ```
 
-4. Install and activate formgradernext extensions:
-
-Install and activate all extensions (assignment list, create assignment, formgrader, and validate):
+1. Install and activate extensions from this repo (formgradernext):
 
 ```bash
 jupyter nbextension install --symlink --sys-prefix --py formgradernext --overwrite
