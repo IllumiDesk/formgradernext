@@ -2,8 +2,11 @@ import os
 import requests
 import sys
 
-from jinja2 import Environment, BaseLoader
+from jinja2 import Environment
+from jinja2 import BaseLoader
+
 from tornado import web
+
 
 from nbgrader.server_extensions.formgrader.base import (
     BaseHandler,
