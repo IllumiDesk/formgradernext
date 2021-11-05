@@ -12,7 +12,7 @@ setup_args = dict(
     version=version_ns['__version__'],
     packages=find_packages(),
     install_requires=[
-        "nbgrader==0.6.2",
+        "nbgrader>=0.6.2",
     ],
     include_package_data=True
 )
